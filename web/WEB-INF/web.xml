@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"
+         metadata-complete="false"
+        >
+
+    <!--a tag a seguir <absolute-ordering /> juntamente com o atributo metadata-complete=true na tag <web-apps>
+    é utilizado para que classes anotadas como Servlet não sejam escaneadas.
+    Se forem alterados, fica a cargo do usuário definir aqui no web.xml tudo da aplicação.
+    -->
+    <!--<absolute-ordering />-->
+
+	<display-name>EMPRESA-DEDICADA Apps</display-name>
+
+    <!-- Listeners -->
+    <listener>
+        <description>Futurepages3 Application Listener</description>
+        <listener-class>org.futurepages.core.control.AppListener</listener-class>
+    </listener>
+</web-app>

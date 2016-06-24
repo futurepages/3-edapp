@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<project basedir="../." default="compile-widgetset" xmlns:ivy="antlib:org.apache.ivy.ant" name="VAADIN: Compile Widgetset">
+
+	<loadproperties srcfile="build/build.properties"/>
+	<property name="workdir" value="${artifacts}/work"/>
+	<property name="warfilename" value="webapp.war"/>
+
+    <ivy:resolve file="build/ivy.xml" />
+	<ivy:cachepath pathid="ivy.deps.default" conf="default" />
+	<ivy:cachepath pathid="ivy.deps.widgetset" conf="widgetset-compile" />
+	<ivy:cachefileset setid="ivy.deps.default.fileset" conf="default"/>
+
+	<path id="classpath">
+		<fileset dir="${webroot}/WEB-INF/lib" erroronmissingdir="no">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${libraries}" erroronmissingdir="no">
+			<include name="*.jar"/>
+		</fileset>
+		<path refid="ivy.deps.default"/>
+	</path>
+
+	<path id="classpath.widgetset">
+		<fileset dir="${webroot}/WEB-INF/lib" erroronmissingdir="no">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${libraries}" erroronmissingdir="no">
+			<include name="*.jar"/>
+		</fileset>
+		<path refid="ivy.deps.widgetset"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="${workdir}"/>
+		<delete dir="${artifacts}"/>
+	</target>
+
+	<target name="-init">
+		<mkdir dir="${artifacts}"/>
+		<mkdir dir="${workdir}"/>
+	</target>
+
+	<target name="compile-project" depends="-init">
+		<javac destdir="${workdir}" debug="${compile.debug}" includeantruntime="no">
+			<src path="${sources}"/>
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	<target name="compile-widgetset" depends="compile-project, -build-widgetset-1, -build-widgetset-2">
+		<!-- the dependencies do all the work here -->
+	</target>
+
+	<taskdef name="buildUniqueWidgetset" classname="org.futurepages.ant.BuildWidgetsets" classpathref="classpath"/>
+
+	<target name="-build-widgetset-1" if="widgetset">
+		<buildUniqueWidgetset classesPath="${basedir}/${classesPath}" source="${basedir}/${sources}"/>
+		<java classname="com.google.gwt.dev.Compiler"
+			  failonerror="yes" fork="yes">
+			<arg value="-war" />
+			<arg value="${basedir}/${webroot}/VAADIN/widgetsets" />
+			<arg value="${widgetset}" />
+			<arg value="-logLevel"/>
+			<!--<arg value="DEBUG"/>-->
+			<arg value="ERROR"/>
+			<arg value="-strict"/>
+            <jvmarg value="-Xmx1024M"/>
+            <jvmarg value="-Xss512M"/>
+            <jvmarg value="-Djava.awt.headless=true"/>
+			<classpath>
+				<pathelement path="${sources}"/>
+				<pathelement path="${workdir}"/>
+				<path refid="classpath.widgetset"/>
+			</classpath>
+			<sysproperty key="vFailIfNotSerializable" value="${failifnotserializable}" />
+		</java>
+
+		<!-- cleanup -->
+		<delete dir="${basedir}/${webroot}/VAADIN/gwt-unitCache"/>
+		<delete dir="${basedir}/${webroot}/VAADIN/widgetsets/WEB-INF"/>
+	</target>
+
+	<target name="-build-widgetset-2" unless="widgetset">
+		<echo message="widgetset is not set - skipping widgetset compilation"/>
+	</target>
+</project>

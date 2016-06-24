@@ -1,0 +1,6 @@
+$.module.title = Administração
+$.module.smallTitle = Administração de Usuários/Permissões
+
+$.user.login = Login
+$.user.fullName = Nome Completo
+$.user.password = Senha
